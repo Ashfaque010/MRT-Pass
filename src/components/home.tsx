@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import CardRechargeFlow from "./CardRechargeFlow";
 import { CreditCard, History, Plus, Settings, User } from "lucide-react";
 
+// Main home page component for the Dhaka MRT Pass app
 const HomePage = () => {
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
   const [showRechargeFlow, setShowRechargeFlow] = useState(false);
@@ -266,8 +267,9 @@ const HomePage = () => {
         )}
       </main>
       {/* Footer */}
-      <footer className="mt-8 text-center text-sm text-gray-500">
-        <p>© 2025 MRT Pass. All rights reserved.</p>
+      <footer className="p-4 text-center text-sm text-gray-400">
+        <p>© 2024 Dhaka MRT Pass. All rights reserved.</p>
+        <p className="text-xs mt-1">Version 1.0.0</p>
       </footer>
     </div>
   );

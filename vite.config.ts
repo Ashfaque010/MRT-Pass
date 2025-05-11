@@ -1,26 +1,37 @@
 import path from "path";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
-import { tempo } from "tempo-devtools/dist/vite";
+import { tempo } from "tempo-devtools/dist/vite"; // Import tempo plugin
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: process.env.NODE_ENV === "development" ? "/" : process.env.VITE_BASE_PATH || "/",
-  optimizeDeps: {
-    entries: ["src/main.tsx", "src/tempobook/**/*"],
+  base: "/",
+  build: {
+    outDir: "dist",
+    minify: "terser",
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ["react", "react-dom", "react-router-dom", "framer-motion"],
+          ui: [
+            "@radix-ui/react-avatar",
+            "@radix-ui/react-progress",
+            "@radix-ui/react-tabs",
+            "@radix-ui/react-radio-group",
+          ],
+        },
+      },
+    },
   },
-  plugins: [
-    react(),
-    tempo(),
-  ],
+  plugins: [react(), tempo()], // Add tempo plugin
   resolve: {
-    preserveSymlinks: true,
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
   },
   server: {
-    // @ts-ignore
-    allowedHosts: true,
-  }
+    // Allow Tempo to access the dev server
+    allowedHosts: process.env.TEMPO === "true" ? true : undefined,
+  },
 });

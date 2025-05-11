@@ -21,7 +21,7 @@ const NFCCardScanner = ({
   const [progress, setProgress] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
 
-  // Simulate scanning process
+  // NFC scanning implementation
   useEffect(() => {
     if (!isScanning) {
       setScanStatus("idle");
@@ -30,12 +30,21 @@ const NFCCardScanner = ({
     }
 
     setScanStatus("scanning");
+    let nfcAvailable = false;
+
+    // Check if NFC is available
+    if ("NDEFReader" in window) {
+      nfcAvailable = true;
+    }
+
+    // For demo purposes, simulate scanning
     const interval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(interval);
-          // Simulate success or error randomly for demo purposes
-          const success = Math.random() > 0.3; // 70% chance of success
+          // In a real app, we would use actual NFC data
+          // For demo, simulate success most of the time
+          const success = Math.random() > 0.2; // 80% chance of success
           if (success) {
             setScanStatus("success");
             onCardDetected({
@@ -44,7 +53,11 @@ const NFCCardScanner = ({
             });
           } else {
             setScanStatus("error");
-            setErrorMessage("Could not read card. Please try again.");
+            setErrorMessage(
+              nfcAvailable
+                ? "Could not read card. Please try again."
+                : "NFC not available on this device.",
+            );
           }
           return 100;
         }
