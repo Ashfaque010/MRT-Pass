@@ -54,7 +54,7 @@ const PaymentMethodSelector = ({
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto bg-white">
+    <Card className="w-full max-w-md mx-auto bg-gray-800 border-none text-white">
       <CardHeader>
         <CardTitle>Payment Method</CardTitle>
         <CardDescription>
@@ -79,16 +79,25 @@ const PaymentMethodSelector = ({
           </div>
         ) : (
           <Tabs defaultValue="card" onValueChange={setSelectedPaymentMethod}>
-            <TabsList className="grid grid-cols-3 w-full">
-              <TabsTrigger value="card">
+            <TabsList className="grid grid-cols-3 w-full bg-gray-700">
+              <TabsTrigger
+                value="card"
+                className="data-[state=active]:bg-blue-600"
+              >
                 <CreditCard className="h-4 w-4 mr-2" />
                 Card
               </TabsTrigger>
-              <TabsTrigger value="mobile">
+              <TabsTrigger
+                value="mobile"
+                className="data-[state=active]:bg-blue-600"
+              >
                 <Smartphone className="h-4 w-4 mr-2" />
                 Mobile
               </TabsTrigger>
-              <TabsTrigger value="other">
+              <TabsTrigger
+                value="other"
+                className="data-[state=active]:bg-blue-600"
+              >
                 <Wallet className="h-4 w-4 mr-2" />
                 Other
               </TabsTrigger>
@@ -117,8 +126,12 @@ const PaymentMethodSelector = ({
 
             <TabsContent value="mobile" className="py-4">
               <RadioGroup defaultValue="bkash" className="space-y-3">
-                <div className="flex items-center space-x-2 border rounded-md p-3">
-                  <RadioGroupItem value="bkash" id="bkash" />
+                <div className="flex items-center space-x-2 border border-gray-600 rounded-md p-3 bg-gray-700">
+                  <RadioGroupItem
+                    value="bkash"
+                    id="bkash"
+                    className="text-blue-400"
+                  />
                   <Label htmlFor="bkash" className="flex items-center">
                     <img
                       src="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=50&q=80"
@@ -128,8 +141,12 @@ const PaymentMethodSelector = ({
                     bKash
                   </Label>
                 </div>
-                <div className="flex items-center space-x-2 border rounded-md p-3">
-                  <RadioGroupItem value="nagad" id="nagad" />
+                <div className="flex items-center space-x-2 border border-gray-600 rounded-md p-3 bg-gray-700">
+                  <RadioGroupItem
+                    value="nagad"
+                    id="nagad"
+                    className="text-blue-400"
+                  />
                   <Label htmlFor="nagad" className="flex items-center">
                     <img
                       src="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=50&q=80"
@@ -139,8 +156,12 @@ const PaymentMethodSelector = ({
                     Nagad
                   </Label>
                 </div>
-                <div className="flex items-center space-x-2 border rounded-md p-3">
-                  <RadioGroupItem value="rocket" id="rocket" />
+                <div className="flex items-center space-x-2 border border-gray-600 rounded-md p-3 bg-gray-700">
+                  <RadioGroupItem
+                    value="rocket"
+                    id="rocket"
+                    className="text-blue-400"
+                  />
                   <Label htmlFor="rocket" className="flex items-center">
                     <img
                       src="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=50&q=80"
@@ -153,25 +174,31 @@ const PaymentMethodSelector = ({
               </RadioGroup>
               <div className="mt-4 space-y-2">
                 <Label htmlFor="mobileNumber">Mobile Number</Label>
-                <Input id="mobileNumber" placeholder="01XXXXXXXXX" />
+                <Input
+                  id="mobileNumber"
+                  placeholder="01XXXXXXXXX"
+                  className="bg-gray-700 border-gray-600"
+                />
               </div>
             </TabsContent>
 
             <TabsContent value="other" className="py-4">
               <div className="space-y-4">
-                <div className="text-center p-6 border-2 border-dashed rounded-md">
+                <div className="text-center p-6 border-2 border-dashed border-gray-600 rounded-md bg-gray-700">
                   <img
                     src="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=200&q=80"
                     alt="QR Code"
                     className="mx-auto h-48 w-48"
                   />
-                  <p className="mt-2 text-sm text-muted-foreground">
+                  <p className="mt-2 text-sm text-gray-300">
                     Scan this QR code with your banking app
                   </p>
                 </div>
                 <div className="text-center">
-                  <p className="text-sm">Or use reference code:</p>
-                  <p className="font-mono font-bold text-lg">
+                  <p className="text-sm text-gray-300">
+                    Or use reference code:
+                  </p>
+                  <p className="font-mono font-bold text-lg text-blue-400">
                     MRT-
                     {Math.random().toString(36).substring(2, 10).toUpperCase()}
                   </p>
@@ -183,13 +210,22 @@ const PaymentMethodSelector = ({
       </CardContent>
       <CardFooter className="flex justify-between">
         <div className="text-lg font-semibold">
-          Amount: ৳{amount.toFixed(2)}
+          Amount: <span className="text-blue-400">৳{amount.toFixed(2)}</span>
         </div>
         <div className="space-x-2">
-          <Button variant="outline" onClick={onCancel} disabled={processing}>
+          <Button
+            variant="outline"
+            onClick={onCancel}
+            disabled={processing}
+            className="border-gray-600 text-white hover:bg-gray-700"
+          >
             Cancel
           </Button>
-          <Button onClick={handlePayment} disabled={processing}>
+          <Button
+            onClick={handlePayment}
+            disabled={processing}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
             {processing ? "Processing..." : "Pay Now"}
           </Button>
         </div>
