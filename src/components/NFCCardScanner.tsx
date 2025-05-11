@@ -79,15 +79,8 @@ const NFCCardScanner = ({
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto bg-white">
+    <Card className="w-full max-w-md mx-auto bg-gray-900 border-gray-800 text-white">
       <CardContent className="p-6 flex flex-col items-center">
-        <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold mb-2">Scan Your NFC Card</h2>
-          <p className="text-gray-500">
-            Hold your card behind your phone to scan
-          </p>
-        </div>
-
         <div className="relative w-full h-64 flex justify-center items-center mb-6">
           {/* Phone illustration */}
           <motion.div
@@ -100,12 +93,12 @@ const NFCCardScanner = ({
               duration: 1.5,
             }}
           >
-            <Smartphone size={120} className="text-gray-800" />
+            <Smartphone size={120} className="text-white" />
           </motion.div>
 
           {/* Card illustration */}
           <motion.div
-            className="absolute bg-blue-500 rounded-xl w-32 h-20 z-0"
+            className="absolute bg-blue-600 rounded-xl w-32 h-20 z-0"
             style={{ top: "60%" }}
             animate={{
               y: scanStatus === "scanning" ? [0, -5, 0] : 0,
@@ -170,8 +163,8 @@ const NFCCardScanner = ({
         {/* Progress indicator */}
         {scanStatus === "scanning" && (
           <div className="w-full mb-4">
-            <Progress value={progress} className="h-2" />
-            <p className="text-center mt-2 text-sm text-gray-500">
+            <Progress value={progress} className="h-2 bg-gray-800" />
+            <p className="text-center mt-2 text-sm text-gray-400">
               Scanning... Please don't move your card
             </p>
           </div>
@@ -184,8 +177,8 @@ const NFCCardScanner = ({
             animate={{ opacity: 1, y: 0 }}
             className="w-full mb-4"
           >
-            <Alert className="bg-green-50 border-green-200">
-              <AlertDescription className="text-green-700 flex items-center">
+            <Alert className="bg-green-900/30 border-green-700 text-green-400">
+              <AlertDescription className="flex items-center">
                 <CheckCircle2 size={16} className="mr-2" />
                 Card detected successfully!
               </AlertDescription>
@@ -200,8 +193,8 @@ const NFCCardScanner = ({
             animate={{ opacity: 1, y: 0 }}
             className="w-full mb-4"
           >
-            <Alert className="bg-red-50 border-red-200">
-              <AlertDescription className="text-red-700 flex items-center">
+            <Alert className="bg-red-900/30 border-red-800 text-red-400">
+              <AlertDescription className="flex items-center">
                 <AlertCircle size={16} className="mr-2" />
                 {errorMessage}
               </AlertDescription>
@@ -209,7 +202,7 @@ const NFCCardScanner = ({
             <Button
               onClick={handleRetry}
               variant="outline"
-              className="mt-4 w-full"
+              className="mt-4 w-full border-blue-700 text-blue-400 hover:bg-blue-900/30 hover:text-blue-300"
             >
               Try Again
             </Button>

@@ -54,10 +54,10 @@ const PaymentMethodSelector = ({
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto bg-white">
+    <Card className="w-full max-w-md mx-auto bg-gray-900 border-gray-800 text-white">
       <CardHeader>
         <CardTitle>Payment Method</CardTitle>
-        <CardDescription>
+        <CardDescription className="text-gray-400">
           Select your preferred payment method to recharge your NFC card.
         </CardDescription>
       </CardHeader>
@@ -66,12 +66,12 @@ const PaymentMethodSelector = ({
           <div className="space-y-4 py-4">
             <div className="text-center mb-4">
               <p className="text-lg font-medium">Processing Payment</p>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-gray-400">
                 Please do not close this window
               </p>
             </div>
-            <Progress value={progress} className="w-full" />
-            <p className="text-center text-sm text-muted-foreground">
+            <Progress value={progress} className="w-full bg-gray-800" />
+            <p className="text-center text-sm text-gray-400">
               {progress < 100
                 ? "Connecting to payment gateway..."
                 : "Payment successful!"}
@@ -79,16 +79,25 @@ const PaymentMethodSelector = ({
           </div>
         ) : (
           <Tabs defaultValue="card" onValueChange={setSelectedPaymentMethod}>
-            <TabsList className="grid grid-cols-3 w-full">
-              <TabsTrigger value="card">
+            <TabsList className="grid grid-cols-3 w-full bg-gray-800">
+              <TabsTrigger
+                value="card"
+                className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+              >
                 <CreditCard className="h-4 w-4 mr-2" />
                 Card
               </TabsTrigger>
-              <TabsTrigger value="mobile">
+              <TabsTrigger
+                value="mobile"
+                className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+              >
                 <Smartphone className="h-4 w-4 mr-2" />
                 Mobile
               </TabsTrigger>
-              <TabsTrigger value="other">
+              <TabsTrigger
+                value="other"
+                className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+              >
                 <Wallet className="h-4 w-4 mr-2" />
                 Other
               </TabsTrigger>
@@ -96,82 +105,131 @@ const PaymentMethodSelector = ({
 
             <TabsContent value="card" className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="cardNumber">Card Number</Label>
-                <Input id="cardNumber" placeholder="1234 5678 9012 3456" />
+                <Label htmlFor="cardNumber" className="text-gray-300">
+                  Card Number
+                </Label>
+                <Input
+                  id="cardNumber"
+                  placeholder="1234 5678 9012 3456"
+                  className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
+                />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="expiry">Expiry Date</Label>
-                  <Input id="expiry" placeholder="MM/YY" />
+                  <Label htmlFor="expiry" className="text-gray-300">
+                    Expiry Date
+                  </Label>
+                  <Input
+                    id="expiry"
+                    placeholder="MM/YY"
+                    className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
+                  />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="cvc">CVC</Label>
-                  <Input id="cvc" placeholder="123" />
+                  <Label htmlFor="cvc" className="text-gray-300">
+                    CVC
+                  </Label>
+                  <Input
+                    id="cvc"
+                    placeholder="123"
+                    className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
+                  />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="name">Cardholder Name</Label>
-                <Input id="name" placeholder="John Doe" />
+                <Label htmlFor="name" className="text-gray-300">
+                  Cardholder Name
+                </Label>
+                <Input
+                  id="name"
+                  placeholder="John Doe"
+                  className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
+                />
               </div>
             </TabsContent>
 
             <TabsContent value="mobile" className="py-4">
               <RadioGroup defaultValue="bkash" className="space-y-3">
-                <div className="flex items-center space-x-2 border rounded-md p-3">
-                  <RadioGroupItem value="bkash" id="bkash" />
-                  <Label htmlFor="bkash" className="flex items-center">
-                    <img
-                      src="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=50&q=80"
-                      alt="bKash"
-                      className="h-8 w-8 mr-2 rounded"
-                    />
+                <div className="flex items-center space-x-2 border border-gray-700 rounded-md p-3 bg-gray-800">
+                  <RadioGroupItem
+                    value="bkash"
+                    id="bkash"
+                    className="border-gray-600 text-blue-500"
+                  />
+                  <Label
+                    htmlFor="bkash"
+                    className="flex items-center text-gray-300"
+                  >
+                    <div className="h-8 w-8 mr-2 rounded bg-pink-600 flex items-center justify-center text-white font-bold text-xs">
+                      bKash
+                    </div>
                     bKash
                   </Label>
                 </div>
-                <div className="flex items-center space-x-2 border rounded-md p-3">
-                  <RadioGroupItem value="nagad" id="nagad" />
-                  <Label htmlFor="nagad" className="flex items-center">
-                    <img
-                      src="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=50&q=80"
-                      alt="Nagad"
-                      className="h-8 w-8 mr-2 rounded"
-                    />
+                <div className="flex items-center space-x-2 border border-gray-700 rounded-md p-3 bg-gray-800">
+                  <RadioGroupItem
+                    value="nagad"
+                    id="nagad"
+                    className="border-gray-600 text-blue-500"
+                  />
+                  <Label
+                    htmlFor="nagad"
+                    className="flex items-center text-gray-300"
+                  >
+                    <div className="h-8 w-8 mr-2 rounded bg-orange-600 flex items-center justify-center text-white font-bold text-xs">
+                      Nagad
+                    </div>
                     Nagad
                   </Label>
                 </div>
-                <div className="flex items-center space-x-2 border rounded-md p-3">
-                  <RadioGroupItem value="rocket" id="rocket" />
-                  <Label htmlFor="rocket" className="flex items-center">
-                    <img
-                      src="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=50&q=80"
-                      alt="Rocket"
-                      className="h-8 w-8 mr-2 rounded"
-                    />
+                <div className="flex items-center space-x-2 border border-gray-700 rounded-md p-3 bg-gray-800">
+                  <RadioGroupItem
+                    value="rocket"
+                    id="rocket"
+                    className="border-gray-600 text-blue-500"
+                  />
+                  <Label
+                    htmlFor="rocket"
+                    className="flex items-center text-gray-300"
+                  >
+                    <div className="h-8 w-8 mr-2 rounded bg-purple-600 flex items-center justify-center text-white font-bold text-xs">
+                      Rocket
+                    </div>
                     Rocket
                   </Label>
                 </div>
               </RadioGroup>
               <div className="mt-4 space-y-2">
-                <Label htmlFor="mobileNumber">Mobile Number</Label>
-                <Input id="mobileNumber" placeholder="01XXXXXXXXX" />
+                <Label htmlFor="mobileNumber" className="text-gray-300">
+                  Mobile Number
+                </Label>
+                <Input
+                  id="mobileNumber"
+                  placeholder="01XXXXXXXXX"
+                  className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
+                />
               </div>
             </TabsContent>
 
             <TabsContent value="other" className="py-4">
               <div className="space-y-4">
-                <div className="text-center p-6 border-2 border-dashed rounded-md">
-                  <img
-                    src="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=200&q=80"
-                    alt="QR Code"
-                    className="mx-auto h-48 w-48"
-                  />
-                  <p className="mt-2 text-sm text-muted-foreground">
+                <div className="text-center p-6 border-2 border-dashed border-gray-700 rounded-md bg-gray-800">
+                  <div className="mx-auto h-48 w-48 bg-gray-700 rounded-md flex items-center justify-center">
+                    <div className="grid grid-cols-3 grid-rows-3 gap-2 w-32 h-32">
+                      {[...Array(9)].map((_, i) => (
+                        <div key={i} className="bg-blue-500 rounded-sm"></div>
+                      ))}
+                    </div>
+                  </div>
+                  <p className="mt-2 text-sm text-gray-400">
                     Scan this QR code with your banking app
                   </p>
                 </div>
                 <div className="text-center">
-                  <p className="text-sm">Or use reference code:</p>
-                  <p className="font-mono font-bold text-lg">
+                  <p className="text-sm text-gray-400">
+                    Or use reference code:
+                  </p>
+                  <p className="font-mono font-bold text-lg text-blue-400">
                     MRT-
                     {Math.random().toString(36).substring(2, 10).toUpperCase()}
                   </p>
@@ -181,15 +239,24 @@ const PaymentMethodSelector = ({
           </Tabs>
         )}
       </CardContent>
-      <CardFooter className="flex justify-between">
+      <CardFooter className="flex justify-between border-t border-gray-800 pt-4">
         <div className="text-lg font-semibold">
-          Amount: ৳{amount.toFixed(2)}
+          Amount: <span className="text-blue-400">৳{amount.toFixed(2)}</span>
         </div>
         <div className="space-x-2">
-          <Button variant="outline" onClick={onCancel} disabled={processing}>
+          <Button
+            variant="outline"
+            onClick={onCancel}
+            disabled={processing}
+            className="border-gray-700 text-gray-300 hover:bg-gray-800"
+          >
             Cancel
           </Button>
-          <Button onClick={handlePayment} disabled={processing}>
+          <Button
+            onClick={handlePayment}
+            disabled={processing}
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+          >
             {processing ? "Processing..." : "Pay Now"}
           </Button>
         </div>

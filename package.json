@@ -69,6 +69,7 @@
     "postcss": "^8.4.38",
     "tailwindcss": "3.4.1",
     "tempo-devtools": "^2.0.103",
+    "terser": "^5.39.0",
     "typescript": "^5.8.2",
     "vite": "^6.2.3"
   }

@@ -1,17 +1,17 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  darkMode: ["class"],
+  darkMode: ["class", "media"],
   content: [
-    './pages/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
   ],
   prefix: "",
   theme: {
     container: {
       center: true,
-      padding: "2rem",
+      padding: "1rem",
       screens: {
         "2xl": "1400px",
       },
@@ -51,6 +51,18 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        blue: {
+          50: "#e6f1fe",
+          100: "#cce3fd",
+          200: "#99c7fb",
+          300: "#66aaf9",
+          400: "#338ef7",
+          500: "#0072f5",
+          600: "#005bc4",
+          700: "#004493",
+          800: "#002e62",
+          900: "#001731",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -66,12 +78,23 @@ module.exports = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        "pulse-ring": {
+          "0%": { transform: "scale(0.8)", opacity: "0.8" },
+          "100%": { transform: "scale(2)", opacity: "0" },
+        },
+        float: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "pulse-ring":
+          "pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite",
+        float: "float 3s ease-in-out infinite",
       },
     },
   },
   plugins: [require("tailwindcss-animate")],
-}
+};
