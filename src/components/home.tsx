@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -12,26 +12,65 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import CardRechargeFlow from "./CardRechargeFlow";
-import { CreditCard, History, Plus, Settings, User } from "lucide-react";
+import NFCCardScanner from "./NFCCardScanner";
+import {
+  ArrowRight,
+  CreditCard,
+  History,
+  RefreshCw,
+  Settings,
+  User,
+} from "lucide-react";
+import { motion } from "framer-motion";
 
 const HomePage = () => {
-  const [selectedCard, setSelectedCard] = useState<string | null>(null);
+  const [scanningMode, setScanningMode] = useState(true);
   const [showRechargeFlow, setShowRechargeFlow] = useState(false);
+  const [cardData, setCardData] = useState<{
+    cardId: string;
+    balance: number;
+    lastUsed?: string;
+  } | null>(null);
 
-  // Mock data for cards
-  const cards = [
+  // Mock transaction history
+  const transactions = [
     {
-      id: "card1",
-      name: "Work Commute Card",
-      balance: 350,
-      lastUsed: "2023-09-15",
+      from: "Agargaon",
+      to: "Mirpur 10",
+      date: "20 May 2024",
+      time: "06:00 PM",
+      amount: 18,
     },
-    { id: "card2", name: "Weekend Card", balance: 120, lastUsed: "2023-09-10" },
-    { id: "card3", name: "Family Card", balance: 75, lastUsed: "2023-09-05" },
+    {
+      from: "Mirpur 11",
+      to: "Agargaon",
+      date: "20 May 2024",
+      time: "05:00 PM",
+      amount: 27,
+    },
+    {
+      from: "Pallabi",
+      to: "Mirpur 11",
+      date: "28 Oct 2023",
+      time: "08:00 AM",
+      amount: 18,
+    },
+    {
+      from: "Mirpur 10",
+      to: "Pallabi",
+      date: "28 Oct 2023",
+      time: "08:00 AM",
+      amount: 18,
+    },
   ];
 
-  const handleCardSelect = (cardId: string) => {
-    setSelectedCard(cardId);
+  const handleCardDetected = (data: { id: string; balance: number }) => {
+    setCardData({
+      cardId: data.id,
+      balance: data.balance,
+      lastUsed: new Date().toISOString().split("T")[0],
+    });
+    setScanningMode(false);
   };
 
   const handleRecharge = () => {
@@ -42,232 +81,135 @@ const HomePage = () => {
     setShowRechargeFlow(false);
   };
 
+  const handleRescan = () => {
+    setScanningMode(true);
+    setCardData(null);
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8 flex flex-col">
+    <div className="min-h-screen bg-black text-white flex flex-col">
       {/* Header */}
-      <header className="flex justify-between items-center mb-6">
+      <header className="flex justify-between items-center p-4 bg-black">
         <div className="flex items-center gap-2">
-          <CreditCard className="h-8 w-8 text-primary" />
-          <h1 className="text-2xl font-bold">MRT Buddy</h1>
+          <CreditCard className="h-6 w-6 text-blue-400" />
+          <h1 className="text-xl font-bold">Dhaka MRT</h1>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" className="text-white">
             <Settings className="h-5 w-5" />
           </Button>
-          <Avatar>
+          <Avatar className="h-8 w-8">
             <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=user123" />
             <AvatarFallback>U</AvatarFallback>
           </Avatar>
         </div>
       </header>
+
       {/* Main Content */}
-      <main className="flex-1">
+      <main className="flex-1 p-4">
         {showRechargeFlow ? (
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-md mx-auto">
             <Button
               variant="ghost"
               onClick={handleCloseRecharge}
-              className="mb-4"
+              className="mb-4 text-white"
             >
-              &larr; Back to Cards
+              &larr; Back
             </Button>
             <CardRechargeFlow onComplete={handleCloseRecharge} />
           </div>
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Card Selection Section */}
-            <div className="lg:col-span-1">
-              <Card className="h-full bg-white">
-                <CardHeader>
-                  <CardTitle className="flex justify-between items-center">
-                    <span>My Cards</span>
-                    <Button variant="outline" size="sm">
-                      <Plus className="h-4 w-4 mr-1" /> Add Card
-                    </Button>
-                  </CardTitle>
-                  <CardDescription>Select a card to manage</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {cards.map((card) => (
-                      <div
-                        key={card.id}
-                        className={`p-4 border rounded-lg cursor-pointer transition-all ${selectedCard === card.id ? "border-primary bg-primary/5" : "border-gray-200 hover:border-gray-300"}`}
-                        onClick={() => handleCardSelect(card.id)}
-                      >
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <h3 className="font-medium">{card.name}</h3>
-                            <p className="text-sm text-gray-500">
-                              Last used: {card.lastUsed}
-                            </p>
-                          </div>
-                          <Badge
-                            variant={
-                              card.balance < 100 ? "destructive" : "secondary"
-                            }
-                          >
-                            ৳{card.balance}
-                          </Badge>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+        ) : scanningMode ? (
+          <div className="flex flex-col items-center justify-center h-full">
+            <div className="text-center mb-8">
+              <h1 className="text-3xl font-bold mb-2">
+                Dhaka MRT or Rapid Pass
+              </h1>
             </div>
+            <div className="w-full max-w-md mx-auto bg-gray-800 rounded-3xl overflow-hidden">
+              <div className="p-8 flex flex-col items-center">
+                <h2 className="text-2xl text-center mb-8">
+                  Tap your card behind your phone to read balance
+                </h2>
+                <NFCCardScanner
+                  onCardDetected={handleCardDetected}
+                  isScanning={true}
+                />
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col max-w-md mx-auto">
+            {/* Card Balance Section */}
+            <Card className="mb-4 bg-gray-800 border-none text-white">
+              <CardContent className="p-6">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h3 className="text-gray-400 text-lg">Latest Balance</h3>
+                    <div className="flex items-center">
+                      <span className="text-blue-400 mr-2">৳</span>
+                      <span className="text-4xl font-bold">
+                        {cardData?.balance}
+                      </span>
+                    </div>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    className="text-blue-400"
+                    onClick={handleRescan}
+                  >
+                    Rescan
+                    <RefreshCw className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
 
-            {/* Card Details Section */}
-            <div className="lg:col-span-2">
-              {selectedCard ? (
-                <Card className="h-full bg-white">
-                  <CardHeader>
-                    <CardTitle>
-                      {cards.find((card) => card.id === selectedCard)?.name}
-                    </CardTitle>
-                    <CardDescription>Card ID: {selectedCard}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="mb-8">
-                      <h3 className="text-lg font-medium mb-2">
-                        Current Balance
-                      </h3>
-                      <div className="flex items-baseline">
-                        <span className="text-4xl font-bold">
-                          ৳
-                          {
-                            cards.find((card) => card.id === selectedCard)
-                              ?.balance
-                          }
-                        </span>
-                        {(cards.find((card) => card.id === selectedCard)
-                          ?.balance || 0) < 100 && (
-                          <span className="ml-2 text-sm text-red-500">
-                            Low balance
-                          </span>
-                        )}
+            {/* Recent Transactions */}
+            <div className="mb-4">
+              <h3 className="text-xl font-bold mb-2">Recent Transactions</h3>
+              <div className="space-y-2">
+                {transactions.map((transaction, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="p-4 bg-gray-800 rounded-lg"
+                  >
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <p className="font-medium">
+                          {transaction.from} → {transaction.to}
+                        </p>
+                        <p className="text-sm text-gray-400">
+                          {transaction.date}, {transaction.time}
+                        </p>
+                      </div>
+                      <div className="flex items-center text-blue-400">
+                        <span className="mr-1">৳</span>
+                        <span className="text-xl">-{transaction.amount}</span>
                       </div>
                     </div>
-
-                    <Tabs defaultValue="history">
-                      <TabsList className="mb-4">
-                        <TabsTrigger value="history">
-                          <History className="h-4 w-4 mr-2" /> Transaction
-                          History
-                        </TabsTrigger>
-                        <TabsTrigger value="profile">
-                          <User className="h-4 w-4 mr-2" /> Card Profile
-                        </TabsTrigger>
-                      </TabsList>
-                      <TabsContent value="history">
-                        <div className="space-y-4">
-                          {/* Mock transaction history */}
-                          <div className="p-3 border-b">
-                            <div className="flex justify-between">
-                              <div>
-                                <p className="font-medium">
-                                  Uttara North to Agargaon
-                                </p>
-                                <p className="text-sm text-gray-500">
-                                  Sep 15, 2023 - 08:45 AM
-                                </p>
-                              </div>
-                              <span className="text-red-500 font-medium">
-                                -৳25
-                              </span>
-                            </div>
-                          </div>
-                          <div className="p-3 border-b">
-                            <div className="flex justify-between">
-                              <div>
-                                <p className="font-medium">
-                                  Recharge via bKash
-                                </p>
-                                <p className="text-sm text-gray-500">
-                                  Sep 14, 2023 - 07:30 PM
-                                </p>
-                              </div>
-                              <span className="text-green-500 font-medium">
-                                +৳200
-                              </span>
-                            </div>
-                          </div>
-                          <div className="p-3 border-b">
-                            <div className="flex justify-between">
-                              <div>
-                                <p className="font-medium">
-                                  Agargaon to Uttara North
-                                </p>
-                                <p className="text-sm text-gray-500">
-                                  Sep 14, 2023 - 05:15 PM
-                                </p>
-                              </div>
-                              <span className="text-red-500 font-medium">
-                                -৳25
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </TabsContent>
-                      <TabsContent value="profile">
-                        <div className="space-y-4">
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <p className="text-sm text-gray-500">Card Type</p>
-                              <p>Standard Rapid Pass</p>
-                            </div>
-                            <div>
-                              <p className="text-sm text-gray-500">
-                                Issue Date
-                              </p>
-                              <p>Jan 15, 2023</p>
-                            </div>
-                            <div>
-                              <p className="text-sm text-gray-500">
-                                Last Recharge
-                              </p>
-                              <p>Sep 14, 2023</p>
-                            </div>
-                            <div>
-                              <p className="text-sm text-gray-500">Status</p>
-                              <Badge>Active</Badge>
-                            </div>
-                          </div>
-                        </div>
-                      </TabsContent>
-                    </Tabs>
-                  </CardContent>
-                  <CardFooter>
-                    <Button
-                      className="w-full"
-                      onClick={handleRecharge}
-                      disabled={!selectedCard}
-                    >
-                      Recharge Card
-                    </Button>
-                  </CardFooter>
-                </Card>
-              ) : (
-                <Card className="h-full flex items-center justify-center bg-white">
-                  <CardContent className="text-center py-12">
-                    <CreditCard className="h-16 w-16 mx-auto text-gray-300 mb-4" />
-                    <h3 className="text-xl font-medium mb-2">
-                      No Card Selected
-                    </h3>
-                    <p className="text-gray-500 mb-6">
-                      Please select a card from the list to view details and
-                      recharge
-                    </p>
-                  </CardContent>
-                </Card>
-              )}
+                  </motion.div>
+                ))}
+              </div>
             </div>
+
+            {/* Recharge Button */}
+            <Button
+              onClick={handleRecharge}
+              className="w-full py-6 text-lg bg-blue-600 hover:bg-blue-700"
+            >
+              Recharge Card
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
           </div>
         )}
       </main>
+
       {/* Footer */}
-      <footer className="mt-8 text-center text-sm text-gray-500">
-        <p>© 2025 MRT Pass. All rights reserved.</p>
+      <footer className="p-4 text-center text-sm text-gray-400">
+        <p>© 2025 Dhaka MRT Pass. All rights reserved.</p>
       </footer>
     </div>
   );

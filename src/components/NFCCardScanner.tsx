@@ -4,7 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { motion } from "framer-motion";
-import { Smartphone, WifiOff, CheckCircle2, AlertCircle } from "lucide-react";
+import {
+  Smartphone,
+  WifiOff,
+  CheckCircle2,
+  AlertCircle,
+  Loader2,
+} from "lucide-react";
 
 interface NFCCardScannerProps {
   onCardDetected?: (cardData: { id: string; balance: number }) => void;
@@ -66,144 +72,140 @@ const NFCCardScanner = ({
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto bg-white">
-      <CardContent className="p-6 flex flex-col items-center">
-        <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold mb-2">Scan Your NFC Card</h2>
-          <p className="text-gray-500">
-            Hold your card behind your phone to scan
-          </p>
-        </div>
+    <div className="w-full flex flex-col items-center">
+      <div className="relative w-full h-64 flex justify-center items-center">
+        {/* Phone illustration */}
+        <motion.div
+          className="relative z-10"
+          animate={{
+            y: scanStatus === "scanning" ? [0, -10, 0] : 0,
+          }}
+          transition={{
+            repeat: scanStatus === "scanning" ? Infinity : 0,
+            duration: 1.5,
+          }}
+        >
+          <Smartphone size={120} className="text-white" />
+        </motion.div>
 
-        <div className="relative w-full h-64 flex justify-center items-center mb-6">
-          {/* Phone illustration */}
-          <motion.div
-            className="relative z-10"
-            animate={{
-              y: scanStatus === "scanning" ? [0, -10, 0] : 0,
-            }}
-            transition={{
-              repeat: scanStatus === "scanning" ? Infinity : 0,
-              duration: 1.5,
-            }}
-          >
-            <Smartphone size={120} className="text-gray-800" />
-          </motion.div>
+        {/* Card illustration */}
+        <motion.div
+          className="absolute bg-blue-400 rounded-xl w-32 h-20 z-0"
+          style={{ top: "60%" }}
+          animate={{
+            y: scanStatus === "scanning" ? [0, -5, 0] : 0,
+            opacity: scanStatus === "error" ? 0.3 : 1,
+          }}
+          transition={{
+            repeat: scanStatus === "scanning" ? Infinity : 0,
+            duration: 1.5,
+            delay: 0.2,
+          }}
+        >
+          <div className="h-full w-full flex items-center justify-center text-white font-bold">
+            MRT Card
+          </div>
+        </motion.div>
 
-          {/* Card illustration */}
-          <motion.div
-            className="absolute bg-blue-500 rounded-xl w-32 h-20 z-0"
-            style={{ top: "60%" }}
-            animate={{
-              y: scanStatus === "scanning" ? [0, -5, 0] : 0,
-              opacity: scanStatus === "error" ? 0.3 : 1,
-            }}
-            transition={{
-              repeat: scanStatus === "scanning" ? Infinity : 0,
-              duration: 1.5,
-              delay: 0.2,
-            }}
-          >
-            <div className="h-full w-full flex items-center justify-center text-white font-bold">
-              MRT Card
-            </div>
-          </motion.div>
-
-          {/* NFC Waves animation */}
-          {scanStatus === "scanning" && (
-            <>
-              <motion.div
-                className="absolute rounded-full border-2 border-blue-400 z-5"
-                initial={{ width: 30, height: 30, opacity: 1 }}
-                animate={{ width: 100, height: 100, opacity: 0 }}
-                transition={{ repeat: Infinity, duration: 2 }}
-                style={{ top: "40%" }}
-              />
-              <motion.div
-                className="absolute rounded-full border-2 border-blue-400 z-5"
-                initial={{ width: 30, height: 30, opacity: 1 }}
-                animate={{ width: 100, height: 100, opacity: 0 }}
-                transition={{ repeat: Infinity, duration: 2, delay: 0.5 }}
-                style={{ top: "40%" }}
-              />
-            </>
-          )}
-
-          {/* Success indicator */}
-          {scanStatus === "success" && (
-            <motion.div
-              className="absolute top-0 right-0"
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            >
-              <CheckCircle2 size={40} className="text-green-500" />
-            </motion.div>
-          )}
-
-          {/* Error indicator */}
-          {scanStatus === "error" && (
-            <motion.div
-              className="absolute top-0 right-0"
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            >
-              <WifiOff size={40} className="text-red-500" />
-            </motion.div>
-          )}
-        </div>
-
-        {/* Progress indicator */}
+        {/* NFC Waves animation */}
         {scanStatus === "scanning" && (
-          <div className="w-full mb-4">
-            <Progress value={progress} className="h-2" />
-            <p className="text-center mt-2 text-sm text-gray-500">
+          <>
+            <motion.div
+              className="absolute rounded-full border-2 border-blue-400 z-5"
+              initial={{ width: 30, height: 30, opacity: 1 }}
+              animate={{ width: 120, height: 120, opacity: 0 }}
+              transition={{ repeat: Infinity, duration: 2 }}
+              style={{ top: "40%" }}
+            />
+            <motion.div
+              className="absolute rounded-full border-2 border-blue-400 z-5"
+              initial={{ width: 30, height: 30, opacity: 1 }}
+              animate={{ width: 120, height: 120, opacity: 0 }}
+              transition={{ repeat: Infinity, duration: 2, delay: 0.5 }}
+              style={{ top: "40%" }}
+            />
+            <motion.div
+              className="absolute rounded-full border-2 border-blue-400 z-5"
+              initial={{ width: 30, height: 30, opacity: 1 }}
+              animate={{ width: 120, height: 120, opacity: 0 }}
+              transition={{ repeat: Infinity, duration: 2, delay: 1 }}
+              style={{ top: "40%" }}
+            />
+          </>
+        )}
+
+        {/* Success indicator */}
+        {scanStatus === "success" && (
+          <motion.div
+            className="absolute top-0 right-0"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          >
+            <CheckCircle2 size={40} className="text-green-500" />
+          </motion.div>
+        )}
+
+        {/* Error indicator */}
+        {scanStatus === "error" && (
+          <motion.div
+            className="absolute top-0 right-0"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          >
+            <WifiOff size={40} className="text-red-500" />
+          </motion.div>
+        )}
+      </div>
+
+      {/* Progress indicator */}
+      {scanStatus === "scanning" && (
+        <div className="w-full mt-6">
+          <div className="flex items-center justify-center">
+            <Loader2 className="h-5 w-5 text-blue-400 animate-spin mr-2" />
+            <p className="text-center text-sm text-blue-400">
               Scanning... Please don't move your card
             </p>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Success message */}
-        {scanStatus === "success" && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="w-full mb-4"
-          >
-            <Alert className="bg-green-50 border-green-200">
-              <AlertDescription className="text-green-700 flex items-center">
-                <CheckCircle2 size={16} className="mr-2" />
-                Card detected successfully!
-              </AlertDescription>
-            </Alert>
-          </motion.div>
-        )}
+      {/* Success message */}
+      {scanStatus === "success" && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full mt-6"
+        >
+          <div className="flex items-center justify-center text-green-400">
+            <CheckCircle2 size={20} className="mr-2" />
+            <p>Card detected successfully!</p>
+          </div>
+        </motion.div>
+      )}
 
-        {/* Error message */}
-        {scanStatus === "error" && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="w-full mb-4"
+      {/* Error message */}
+      {scanStatus === "error" && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full mt-6"
+        >
+          <div className="flex items-center justify-center text-red-400 mb-4">
+            <AlertCircle size={20} className="mr-2" />
+            <p>{errorMessage}</p>
+          </div>
+          <Button
+            onClick={handleRetry}
+            variant="outline"
+            className="mt-2 w-full text-white border-white hover:bg-gray-700"
           >
-            <Alert className="bg-red-50 border-red-200">
-              <AlertDescription className="text-red-700 flex items-center">
-                <AlertCircle size={16} className="mr-2" />
-                {errorMessage}
-              </AlertDescription>
-            </Alert>
-            <Button
-              onClick={handleRetry}
-              variant="outline"
-              className="mt-4 w-full"
-            >
-              Try Again
-            </Button>
-          </motion.div>
-        )}
-      </CardContent>
-    </Card>
+            Try Again
+          </Button>
+        </motion.div>
+      )}
+    </div>
   );
 };
 
