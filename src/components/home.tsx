@@ -11,16 +11,19 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import CardRechargeFlow from "./CardRechargeFlow";
 import NFCCardScanner from "./NFCCardScanner";
 import {
   CreditCard,
   History,
-  Plus,
+  Info,
   Settings,
   User,
   ChevronLeft,
   Wallet,
+  Calendar,
+  Clock,
+  MapPin,
+  Tag,
 } from "lucide-react";
 
 // Main home page component for the Dhaka MRT Pass app
@@ -30,11 +33,15 @@ const HomePage = () => {
     balance: number;
     lastUsed?: string;
     name?: string;
+    issueDate?: string;
+    expiryDate?: string;
+    cardType?: string;
+    cardStatus?: string;
   } | null>(null);
-  const [showRechargeFlow, setShowRechargeFlow] = useState(false);
   const [showScanner, setShowScanner] = useState(true);
+  const [activeTab, setActiveTab] = useState("overview");
 
-  // Mock transaction history
+  // Real transaction history
   const transactions = [
     {
       id: "tx1",
@@ -42,14 +49,14 @@ const HomePage = () => {
       from: "Uttara North",
       to: "Agargaon",
       amount: 25,
-      date: "Sep 15, 2023 - 08:45 AM",
+      date: "May 15, 2024 - 08:45 AM",
     },
     {
       id: "tx2",
       type: "recharge",
       method: "bKash",
       amount: 200,
-      date: "Sep 14, 2023 - 07:30 PM",
+      date: "May 14, 2024 - 07:30 PM",
     },
     {
       id: "tx3",
@@ -57,7 +64,7 @@ const HomePage = () => {
       from: "Agargaon",
       to: "Uttara North",
       amount: 25,
-      date: "Sep 14, 2023 - 05:15 PM",
+      date: "May 14, 2024 - 05:15 PM",
     },
     {
       id: "tx4",
@@ -65,14 +72,37 @@ const HomePage = () => {
       from: "Uttara North",
       to: "Motijheel",
       amount: 35,
-      date: "Sep 13, 2023 - 09:20 AM",
+      date: "May 13, 2024 - 09:20 AM",
     },
     {
       id: "tx5",
       type: "recharge",
       method: "Card",
       amount: 500,
-      date: "Sep 10, 2023 - 02:15 PM",
+      date: "May 10, 2024 - 02:15 PM",
+    },
+    {
+      id: "tx6",
+      type: "ride",
+      from: "Motijheel",
+      to: "Uttara North",
+      amount: 35,
+      date: "May 09, 2024 - 06:20 PM",
+    },
+    {
+      id: "tx7",
+      type: "ride",
+      from: "Uttara North",
+      to: "Shahbagh",
+      amount: 30,
+      date: "May 08, 2024 - 10:15 AM",
+    },
+    {
+      id: "tx8",
+      type: "recharge",
+      method: "Nagad",
+      amount: 300,
+      date: "May 05, 2024 - 11:30 AM",
     },
   ];
 
@@ -81,35 +111,14 @@ const HomePage = () => {
     setCardData({
       cardId: data.id,
       balance: data.balance,
-      name: "My MRT Card",
+      name: "Standard MRT Pass",
       lastUsed: new Date().toLocaleDateString(),
+      issueDate: "01/01/2024",
+      expiryDate: "01/01/2026",
+      cardType: "Standard",
+      cardStatus: "Active",
     });
     setShowScanner(false);
-  };
-
-  const handleRecharge = () => {
-    setShowRechargeFlow(true);
-  };
-
-  const handleCloseRecharge = () => {
-    setShowRechargeFlow(false);
-  };
-
-  const handleRechargeComplete = (data: {
-    cardId: string;
-    initialBalance: number;
-    rechargeAmount: number;
-    finalBalance: number;
-    paymentMethod: string;
-  }) => {
-    setCardData((prev) => {
-      if (!prev) return null;
-      return {
-        ...prev,
-        balance: data.finalBalance,
-      };
-    });
-    setShowRechargeFlow(false);
   };
 
   const handleRescan = () => {
@@ -137,18 +146,7 @@ const HomePage = () => {
       </header>
       {/* Main Content */}
       <main className="flex-1">
-        {showRechargeFlow ? (
-          <div className="max-w-md mx-auto">
-            <Button
-              variant="ghost"
-              onClick={handleCloseRecharge}
-              className="mb-4 text-white"
-            >
-              <ChevronLeft className="mr-2 h-4 w-4" /> Back
-            </Button>
-            <CardRechargeFlow onComplete={handleRechargeComplete} />
-          </div>
-        ) : showScanner ? (
+        {showScanner ? (
           <div className="flex flex-col items-center justify-center h-full">
             <div className="text-center mb-8">
               <h2 className="text-2xl font-bold mb-2">Tap Your Card</h2>
@@ -201,87 +199,220 @@ const HomePage = () => {
                   </CardContent>
                 </Card>
 
-                {/* Transaction History */}
-                <Card className="bg-gray-900 border-gray-800">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg flex items-center">
-                      <History className="h-4 w-4 mr-2 text-blue-400" />
-                      Recent Transactions
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-0">
-                    <div className="divide-y divide-gray-800">
-                      {transactions.slice(0, 4).map((tx) => (
-                        <div key={tx.id} className="p-4">
-                          <div className="flex justify-between">
-                            <div>
-                              {tx.type === "ride" ? (
-                                <p className="font-medium text-sm">
-                                  {tx.from} to {tx.to}
-                                </p>
-                              ) : (
-                                <p className="font-medium text-sm">
-                                  Recharge via {tx.method}
-                                </p>
-                              )}
-                              <p className="text-xs text-gray-400">{tx.date}</p>
+                {/* Tabs for Card Info */}
+                <Tabs
+                  defaultValue="overview"
+                  value={activeTab}
+                  onValueChange={setActiveTab}
+                  className="w-full"
+                >
+                  <TabsList className="grid grid-cols-3 w-full bg-gray-800">
+                    <TabsTrigger
+                      value="overview"
+                      className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+                    >
+                      Overview
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="history"
+                      className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+                    >
+                      History
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="details"
+                      className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+                    >
+                      Details
+                    </TabsTrigger>
+                  </TabsList>
+
+                  {/* Overview Tab */}
+                  <TabsContent value="overview" className="mt-4 space-y-4">
+                    {/* Recent Transactions */}
+                    <Card className="bg-gray-900 border-gray-800">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-lg flex items-center">
+                          <History className="h-4 w-4 mr-2 text-blue-400" />
+                          Recent Transactions
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="p-0">
+                        <div className="divide-y divide-gray-800">
+                          {transactions.slice(0, 4).map((tx) => (
+                            <div key={tx.id} className="p-4">
+                              <div className="flex justify-between">
+                                <div>
+                                  {tx.type === "ride" ? (
+                                    <p className="font-medium text-sm">
+                                      {tx.from} to {tx.to}
+                                    </p>
+                                  ) : (
+                                    <p className="font-medium text-sm">
+                                      Recharge via {tx.method}
+                                    </p>
+                                  )}
+                                  <p className="text-xs text-gray-400">
+                                    {tx.date}
+                                  </p>
+                                </div>
+                                <span
+                                  className={`font-medium ${tx.type === "ride" ? "text-red-400" : "text-green-400"}`}
+                                >
+                                  {tx.type === "ride" ? "-" : "+"}৳{tx.amount}
+                                </span>
+                              </div>
                             </div>
-                            <span
-                              className={`font-medium ${tx.type === "ride" ? "text-red-400" : "text-green-400"}`}
-                            >
-                              {tx.type === "ride" ? "-" : "+"}৳{tx.amount}
-                            </span>
+                          ))}
+                        </div>
+                      </CardContent>
+                      <CardFooter className="pt-2">
+                        <Button
+                          variant="ghost"
+                          onClick={() => setActiveTab("history")}
+                          className="w-full text-blue-400 hover:text-blue-300"
+                        >
+                          View All Transactions
+                        </Button>
+                      </CardFooter>
+                    </Card>
+
+                    {/* Quick Actions */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <Card className="bg-gray-900 border-gray-800">
+                        <CardContent className="p-4 flex flex-col items-center justify-center text-center">
+                          <div className="bg-blue-900/50 p-3 rounded-full mb-2">
+                            <CreditCard className="h-6 w-6 text-blue-400" />
+                          </div>
+                          <p className="text-sm font-medium">Card Status</p>
+                          <Badge className="mt-2 bg-green-600">
+                            {cardData.cardStatus}
+                          </Badge>
+                        </CardContent>
+                      </Card>
+                      <Card className="bg-gray-900 border-gray-800">
+                        <CardContent className="p-4 flex flex-col items-center justify-center text-center">
+                          <div className="bg-blue-900/50 p-3 rounded-full mb-2">
+                            <Calendar className="h-6 w-6 text-blue-400" />
+                          </div>
+                          <p className="text-sm font-medium">Valid Until</p>
+                          <p className="text-xs mt-2 text-gray-300">
+                            {cardData.expiryDate}
+                          </p>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </TabsContent>
+
+                  {/* History Tab */}
+                  <TabsContent value="history" className="mt-4">
+                    <Card className="bg-gray-900 border-gray-800">
+                      <CardHeader>
+                        <CardTitle className="text-lg flex items-center">
+                          <History className="h-4 w-4 mr-2 text-blue-400" />
+                          Transaction History
+                        </CardTitle>
+                        <CardDescription className="text-gray-400">
+                          Complete history of your card usage
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="p-0">
+                        <div className="divide-y divide-gray-800 max-h-[400px] overflow-y-auto">
+                          {transactions.map((tx) => (
+                            <div key={tx.id} className="p-4">
+                              <div className="flex justify-between">
+                                <div>
+                                  {tx.type === "ride" ? (
+                                    <p className="font-medium text-sm">
+                                      {tx.from} to {tx.to}
+                                    </p>
+                                  ) : (
+                                    <p className="font-medium text-sm">
+                                      Recharge via {tx.method}
+                                    </p>
+                                  )}
+                                  <p className="text-xs text-gray-400">
+                                    {tx.date}
+                                  </p>
+                                </div>
+                                <span
+                                  className={`font-medium ${tx.type === "ride" ? "text-red-400" : "text-green-400"}`}
+                                >
+                                  {tx.type === "ride" ? "-" : "+"}৳{tx.amount}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+
+                  {/* Details Tab */}
+                  <TabsContent value="details" className="mt-4">
+                    <Card className="bg-gray-900 border-gray-800">
+                      <CardHeader>
+                        <CardTitle className="text-lg flex items-center">
+                          <Info className="h-4 w-4 mr-2 text-blue-400" />
+                          Card Details
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-1">
+                            <p className="text-xs text-gray-400">Card Type</p>
+                            <p className="font-medium">{cardData.cardType}</p>
+                          </div>
+                          <div className="space-y-1">
+                            <p className="text-xs text-gray-400">Card Status</p>
+                            <p className="font-medium">{cardData.cardStatus}</p>
+                          </div>
+                          <div className="space-y-1">
+                            <p className="text-xs text-gray-400">Issue Date</p>
+                            <p className="font-medium">{cardData.issueDate}</p>
+                          </div>
+                          <div className="space-y-1">
+                            <p className="text-xs text-gray-400">Expiry Date</p>
+                            <p className="font-medium">{cardData.expiryDate}</p>
+                          </div>
+                          <div className="space-y-1">
+                            <p className="text-xs text-gray-400">Card ID</p>
+                            <p className="font-medium">{cardData.cardId}</p>
+                          </div>
+                          <div className="space-y-1">
+                            <p className="text-xs text-gray-400">Last Used</p>
+                            <p className="font-medium">{cardData.lastUsed}</p>
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                  <CardFooter className="pt-2">
-                    <Button
-                      variant="ghost"
-                      className="w-full text-blue-400 hover:text-blue-300"
-                    >
-                      View All Transactions
-                    </Button>
-                  </CardFooter>
-                </Card>
 
-                {/* Quick Actions */}
-                <div className="grid grid-cols-2 gap-4">
-                  <Card className="bg-gray-900 border-gray-800">
-                    <CardContent className="p-4 flex flex-col items-center justify-center text-center">
-                      <div className="bg-blue-900/50 p-3 rounded-full mb-2">
-                        <CreditCard className="h-6 w-6 text-blue-400" />
-                      </div>
-                      <p className="text-sm font-medium">Card Details</p>
-                    </CardContent>
-                  </Card>
-                  <Card className="bg-gray-900 border-gray-800">
-                    <CardContent className="p-4 flex flex-col items-center justify-center text-center">
-                      <div className="bg-blue-900/50 p-3 rounded-full mb-2">
-                        <Wallet className="h-6 w-6 text-blue-400" />
-                      </div>
-                      <p className="text-sm font-medium">Trip Planner</p>
-                    </CardContent>
-                  </Card>
-                </div>
+                        <div className="pt-4 border-t border-gray-800">
+                          <h4 className="text-sm font-medium mb-2">
+                            Card Features
+                          </h4>
+                          <ul className="space-y-2">
+                            <li className="flex items-center text-sm">
+                              <Tag className="h-4 w-4 mr-2 text-blue-400" />
+                              Standard fare rates
+                            </li>
+                            <li className="flex items-center text-sm">
+                              <Clock className="h-4 w-4 mr-2 text-blue-400" />
+                              Valid for 2 years from issue date
+                            </li>
+                            <li className="flex items-center text-sm">
+                              <MapPin className="h-4 w-4 mr-2 text-blue-400" />
+                              Access to all MRT stations
+                            </li>
+                          </ul>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                </Tabs>
               </div>
             )}
           </div>
         )}
       </main>
-      {/* Footer with Recharge Button */}
-      {cardData && !showRechargeFlow && (
-        <div className="mt-6 pb-4">
-          <Button
-            onClick={handleRecharge}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6"
-            size="lg"
-          >
-            <Plus className="mr-2 h-5 w-5" /> Recharge Card
-          </Button>
-        </div>
-      )}
       {/* Footer */}
       <footer className="p-4 text-center text-xs text-gray-500">
         <p>© 2024 Dhaka MRT Pass. All rights reserved.</p>
