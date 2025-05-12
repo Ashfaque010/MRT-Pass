@@ -20,8 +20,9 @@ const NFCCardScanner = ({
   >("idle");
   const [progress, setProgress] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
+  const [serialNumber, setSerialNumber] = useState<string | null>(null);
 
-  // Real NFC scanning implementation
+  // NFC scanning implementation
   useEffect(() => {
     if (!isScanning) {
       setScanStatus("idle");
@@ -41,16 +42,39 @@ const NFCCardScanner = ({
           // @ts-ignore - NDEFReader is not in the TypeScript types yet
           const ndef = new window.NDEFReader();
           await ndef.scan();
+          console.log("Scan started successfully.");
 
           // @ts-ignore - NDEFReader events are not in the TypeScript types yet
-          ndef.addEventListener("reading", ({ message, serialNumber }) => {
-            // In a real implementation, you would parse the NFC data
-            // For now, we'll use the serial number as the card ID
+          ndef.addEventListener("reading", ({ serialNumber }) => {
+            console.log(`> Serial Number: ${serialNumber}`);
+            setSerialNumber(serialNumber);
             setScanStatus("success");
+            setProgress(100);
+
+            // Format the serial number to be more readable
+            const formattedSerial = serialNumber
+              ? serialNumber
+                  .replace(/(.{2})/g, "$1:")
+                  .slice(0, -1)
+                  .toUpperCase()
+              : "Unknown";
+
+            // Get card balance from API or mock it
+            const mockBalance = Math.floor(Math.random() * 500) + 100;
+
             onCardDetected({
-              id: serialNumber || "MRT12345",
-              balance: 500, // This would come from the card data in real implementation
+              id: formattedSerial,
+              balance: mockBalance,
             });
+          });
+
+          // @ts-ignore
+          ndef.addEventListener("error", (error) => {
+            console.error(`Error! ${error}`);
+            setScanStatus("error");
+            setErrorMessage(
+              `Error reading NFC: ${error.message || "Unknown error"}`,
+            );
           });
 
           // Progress simulation for UX feedback
@@ -65,11 +89,12 @@ const NFCCardScanner = ({
           }, 200);
 
           return () => clearInterval(interval);
-        } catch (error) {
+        } catch (error: any) {
           console.error("Error scanning NFC:", error);
           setScanStatus("error");
           setErrorMessage(
-            "Could not access NFC. Please make sure NFC is enabled and try again.",
+            error.message ||
+              "Could not access NFC. Please make sure NFC is enabled and try again.",
           );
         }
       };
@@ -87,8 +112,10 @@ const NFCCardScanner = ({
       if (scanStatus === "scanning") {
         setScanStatus("success");
         setProgress(100);
+        const mockSerial = "04:A2:B3:C4:D5:E6";
+        setSerialNumber(mockSerial);
         onCardDetected({
-          id: "MRT12345",
+          id: mockSerial,
           balance: 500,
         });
       }
@@ -101,6 +128,7 @@ const NFCCardScanner = ({
     setScanStatus("idle");
     setProgress(0);
     setErrorMessage("");
+    setSerialNumber(null);
     // Restart scanning
     setTimeout(() => {
       setScanStatus("scanning");
@@ -139,7 +167,7 @@ const NFCCardScanner = ({
               delay: 0.2,
             }}
           >
-            <div className="h-full w-full flex items-center justify-center text-white font-bold">
+            <div className="h-full w-full flex items-center justify-center text-white font-bold text-xs">
               MRT Card
             </div>
           </motion.div>
@@ -210,6 +238,9 @@ const NFCCardScanner = ({
               <AlertDescription className="flex items-center">
                 <CheckCircle2 size={16} className="mr-2" />
                 Card detected successfully!
+                {serialNumber && (
+                  <span className="ml-2 font-mono text-xs">{serialNumber}</span>
+                )}
               </AlertDescription>
             </Alert>
           </motion.div>
