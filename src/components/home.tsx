@@ -1,29 +1,12 @@
 import React, { useState, useEffect } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import NFCCardScanner from "./NFCCardScanner";
 import {
   CreditCard,
   History,
-  Info,
   Settings,
-  User,
-  ChevronLeft,
-  Wallet,
-  Calendar,
-  Clock,
-  MapPin,
   Tag,
+  CreditCardIcon,
 } from "lucide-react";
 
 // Main home page component for the Dhaka MRT Pass app
@@ -33,13 +16,7 @@ const HomePage = () => {
     balance: number;
     lastUsed?: string;
     name?: string;
-    issueDate?: string;
-    expiryDate?: string;
-    cardType?: string;
-    cardStatus?: string;
   } | null>(null);
-  const [showScanner, setShowScanner] = useState(true);
-  const [activeTab, setActiveTab] = useState("overview");
 
   // Real transaction history based on the screenshot
   const transactions = [
@@ -86,17 +63,7 @@ const HomePage = () => {
       balance: data.balance,
       name: "Dhaka Rapid Pass",
       lastUsed: new Date().toLocaleDateString(),
-      issueDate: "01/01/2024",
-      expiryDate: "01/01/2026",
-      cardType: "Standard",
-      cardStatus: "Active",
     });
-    setShowScanner(false);
-  };
-
-  const handleRescan = () => {
-    setShowScanner(true);
-    setCardData(null);
   };
 
   return (
@@ -104,12 +71,13 @@ const HomePage = () => {
       {/* Header */}
       <header className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-bold">MRT Buddy</h1>
+          <h1 className="text-2xl font-bold">MRT Pass</h1>
         </div>
       </header>
+
       {/* Main Content */}
       <main className="flex-1">
-        {showScanner ? (
+        {!cardData ? (
           <div className="flex flex-col items-center justify-center h-full">
             <div className="text-center mb-8">
               <h2 className="text-2xl font-bold mb-2">Tap Your Rapid Pass</h2>
@@ -124,61 +92,74 @@ const HomePage = () => {
           </div>
         ) : (
           <div className="max-w-md mx-auto">
-            {cardData && (
-              <div className="space-y-6">
-                {/* Card Balance Section */}
-                <Card className="bg-gray-50 border-none shadow-sm overflow-hidden">
-                  <CardContent className="p-6">
-                    <div className="mb-2">
-                      <p className="text-gray-500 text-lg">Latest Balance</p>
-                      <div className="flex items-center justify-center mt-4">
-                        <span className="text-5xl font-bold">
-                          ৳ {cardData.balance}
-                        </span>
-                      </div>
+            <div className="space-y-6">
+              {/* Card ID Section */}
+              <Card className="bg-gray-50 border-none shadow-sm overflow-hidden">
+                <CardContent className="p-6">
+                  <div className="mb-2">
+                    <p className="text-gray-500 text-lg">Card ID</p>
+                    <div className="flex items-center justify-center mt-4">
+                      <span className="text-xl font-mono">
+                        {cardData.cardId}
+                      </span>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </CardContent>
+              </Card>
 
-                {/* Recent Journeys */}
-                <Card className="bg-gray-50 border-none shadow-sm">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-xl">Recent Journeys</CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-0">
-                    <div className="divide-y divide-gray-200">
-                      {transactions.map((tx) => (
-                        <div key={tx.id} className="p-4">
-                          <div className="flex justify-between">
-                            <div>
-                              {tx.type === "journey" ? (
-                                <p className="font-medium">
-                                  {tx.from} → {tx.to}
-                                </p>
-                              ) : (
-                                <p className="font-medium">Balance Update</p>
-                              )}
-                              <p className="text-sm text-gray-500">
-                                {tx.date}, {tx.time}
-                              </p>
-                            </div>
-                            <span
-                              className={`font-medium ${tx.type === "journey" ? "text-red-600" : "text-green-600"}`}
-                            >
-                              {tx.type === "journey" ? "৳ -" : "৳ "}
-                              {tx.amount}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
+              {/* Card Balance Section */}
+              <Card className="bg-gray-50 border-none shadow-sm overflow-hidden">
+                <CardContent className="p-6">
+                  <div className="mb-2">
+                    <p className="text-gray-500 text-lg">Latest Balance</p>
+                    <div className="flex items-center justify-center mt-4">
+                      <span className="text-5xl font-bold">
+                        ৳ {cardData.balance}
+                      </span>
                     </div>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Recent Journeys */}
+              <Card className="bg-gray-50 border-none shadow-sm">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-xl">Recent Journeys</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <div className="divide-y divide-gray-200">
+                    {transactions.map((tx) => (
+                      <div key={tx.id} className="p-4">
+                        <div className="flex justify-between">
+                          <div>
+                            {tx.type === "journey" ? (
+                              <p className="font-medium">
+                                {tx.from} → {tx.to}
+                              </p>
+                            ) : (
+                              <p className="font-medium">Balance Update</p>
+                            )}
+                            <p className="text-sm text-gray-500">
+                              {tx.date}, {tx.time}
+                            </p>
+                          </div>
+                          <span
+                            className={`font-medium ${tx.type === "journey" ? "text-red-600" : "text-green-600"}`}
+                          >
+                            {tx.type === "journey" ? "৳ -" : "৳ "}
+                            {tx.amount}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         )}
       </main>
+
       {/* Footer Navigation */}
       <footer className="mt-6 pt-4 border-t border-gray-200">
         <div className="flex justify-around">

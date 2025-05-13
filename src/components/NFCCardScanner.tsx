@@ -17,7 +17,7 @@ const NFCCardScanner = ({
 }: NFCCardScannerProps) => {
   const [scanStatus, setScanStatus] = useState<
     "idle" | "scanning" | "success" | "error"
-  >("idle");
+  >("scanning"); // Start scanning immediately
   const [progress, setProgress] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
   const [serialNumber, setSerialNumber] = useState<string | null>(null);
